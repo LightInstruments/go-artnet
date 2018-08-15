@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jsimonetti/go-artnet/packet/code"
-)
+	)
 
 var _ ArtNetPacket = &ArtPollReplyPacket{}
 
@@ -136,12 +136,20 @@ type ArtPollReplyPacket struct {
 
 // NewArtPollReplyPacket returns a new ArtPollReply Packet
 func NewArtPollReplyPacket() *ArtPollReplyPacket {
-	return &ArtPollReplyPacket{}
+	return &ArtPollReplyPacket{
+		ID:ArtNet,
+		OpCode: code.OpPollReply,
+	}
 }
 
 // MarshalBinary marshals an ArtPollReplyPacket into a byte slice.
 func (p *ArtPollReplyPacket) MarshalBinary() ([]byte, error) {
-	return marshalPacket(p)
+	b, err := marshalPacket(p)
+	//swap port 14+15
+	tmp := b[14]
+	b[14] = b[15]
+	b[15] = tmp
+	return b, err
 }
 
 // UnmarshalBinary unmarshals the contents of a byte slice into an ArtPollReplyPacket.
@@ -154,8 +162,6 @@ func (p *ArtPollReplyPacket) validate() error {
 	// ArtPollReply is a packer not using the standard header, so we need to do
 	// some extra things here that are normally done in the header validate
 
-	// swap endianness
-	p.OpCode = code.OpCode(swapUint16(uint16(p.OpCode)))
 	if p.OpCode != code.OpPollReply {
 		return errInvalidOpCode
 	}
@@ -174,11 +180,4 @@ func (p *ArtPollReplyPacket) validate() error {
 		return errInvalidStyleCode
 	}
 	return nil
-}
-
-// finish is used to finish the Packet for sending.
-func (p *ArtPollReplyPacket) finish() {
-	p.ID = ArtNet
-	p.OpCode = code.OpCode(swapUint16(uint16(code.OpPollReply)))
-	p.Port = swapUint16(p.Port)
 }

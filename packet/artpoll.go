@@ -2,6 +2,7 @@ package packet
 
 import (
 	"github.com/jsimonetti/go-artnet/packet/code"
+	"github.com/jsimonetti/go-artnet/version"
 )
 
 var _ ArtNetPacket = &ArtPollPacket{}
@@ -49,7 +50,9 @@ type ArtPollPacket struct {
 
 // NewArtPollPacket returns an ArtNetPacket with the correct OpCode
 func NewArtPollPacket() *ArtPollPacket {
-	return &ArtPollPacket{}
+	return &ArtPollPacket{
+		Header: Header{ArtNet,code.OpPoll,version.Bytes()},
+	}
 }
 
 // MarshalBinary marshals an ArtPollPacket into a byte slice.
@@ -71,10 +74,4 @@ func (p *ArtPollPacket) validate() error {
 		return errInvalidOpCode
 	}
 	return nil
-}
-
-// finish is used to finish the Packet for sending.
-func (p *ArtPollPacket) finish() {
-	p.OpCode = code.OpCode(swapUint16(uint16(code.OpPoll)))
-	p.Header.finish()
 }

@@ -1,13 +1,9 @@
 package packet
 
 import (
-	"bytes"
-	"encoding"
-	"encoding/binary"
+			"encoding/binary"
 	"errors"
-	"fmt"
-
-	"github.com/jsimonetti/go-artnet/packet/code"
+		"github.com/jsimonetti/go-artnet/packet/code"
 	"github.com/jsimonetti/go-artnet/version"
 )
 
@@ -19,14 +15,6 @@ var (
 	errInvalidOpCode         = errors.New("invalid OpCode in packet")
 	errInvalidStyleCode      = errors.New("invalid StyleCode in packet")
 )
-
-// ArtNetPacket is the interface used for passing around different kinds of ArtNet packets.
-type ArtNetPacket interface {
-	encoding.BinaryMarshaler
-	encoding.BinaryUnmarshaler
-	validate() error
-	finish()
-}
 
 // ArtNet is the fixed string "Art-Net" terminated with a zero
 var ArtNet = [8]byte{0x41, 0x72, 0x74, 0x2d, 0x4e, 0x65, 0x74, 0x00}
@@ -62,11 +50,9 @@ func (p *Header) validate() error {
 	if p.ID != ArtNet {
 		return errInvalidPacket
 	}
-	if p.Version[1] < version.Bytes()[1] {
-		return fmt.Errorf("incompatible version. want: =>14, got: %d", p.Version[1])
-	}
-	// swap endianness
-	p.OpCode = code.OpCode(swapUint16(uint16(p.OpCode)))
+	//if p.Version[1] < version.Bytes()[1] {
+	//	return fmt.Errorf("incompatible version. want: =>14, got: %d", p.Version[1])
+	//}
 	return nil
 }
 
@@ -75,23 +61,6 @@ func (p *Header) finish() {
 	p.ID = ArtNet
 	p.OpCode = code.OpCode(uint16(p.OpCode&0xff) + uint16(p.OpCode>>8))
 	p.Version = version.Bytes()
-}
-
-func marshalPacket(p ArtNetPacket) ([]byte, error) {
-	p.finish()
-	var buf bytes.Buffer
-	if err := binary.Write(&buf, binary.BigEndian, p); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-func unmarshalPacket(p ArtNetPacket, b []byte) error {
-	buf := bytes.NewReader(b)
-	if err := binary.Read(buf, binary.BigEndian, p); err != nil {
-		return err
-	}
-	return p.validate()
 }
 
 func swapUint16(x uint16) uint16 {

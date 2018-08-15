@@ -11,9 +11,9 @@ import (
 
 func main() {
 
-	dst := fmt.Sprintf("%s:%d", "255.255.255.255", packet.ArtNetPort)
+	dst := fmt.Sprintf("%s:%d", "255.255.255.255", packet.ArtNetPort +1)
 	broadcastAddr, _ := net.ResolveUDPAddr("udp", dst)
-	src := fmt.Sprintf("%s:%d", "2.12.12.12", packet.ArtNetPort)
+	src := fmt.Sprintf("%s:%d", "10.69.69.70", packet.ArtNetPort)
 	localAddr, _ := net.ResolveUDPAddr("udp", src)
 
 	conn, err := net.ListenUDP("udp", localAddr)
@@ -22,7 +22,7 @@ func main() {
 		return
 	}
 
-	p := &packet.ArtPollPacket{}
+	p := packet.NewArtPollPacket()
 	b, err := p.MarshalBinary()
 	if err != nil {
 		fmt.Printf("error marshalling packet: %s\n", err)
@@ -51,10 +51,10 @@ func main() {
 
 			}
 			fmt.Printf("packet received from %v, read %d bytes\n", addr.IP, n)
-			if addr.IP.Equal(localAddr.IP) {
-				// skip messages from myself
-				continue
-			}
+			//if addr.IP.Equal(localAddr.IP) {
+			//	// skip messages from myself
+			//	continue
+			//}
 			recvCh <- buf[:n]
 		}
 	}()

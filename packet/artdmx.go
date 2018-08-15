@@ -2,7 +2,7 @@ package packet
 
 import (
 	"github.com/jsimonetti/go-artnet/packet/code"
-)
+	)
 
 var _ ArtNetPacket = &ArtDMXPacket{}
 
@@ -67,11 +67,13 @@ type ArtDMXPacket struct {
 
 // NewArtDMXPacket returns an ArtNetPacket with the correct OpCode
 func NewArtDMXPacket() *ArtDMXPacket {
-	return &ArtDMXPacket{}
+	return &ArtDMXPacket{
+	}
 }
 
 // MarshalBinary marshals an ArtDMXPacket into a byte slice.
 func (p *ArtDMXPacket) MarshalBinary() ([]byte, error) {
+	p.finish()
 	return marshalPacket(p)
 }
 
@@ -93,7 +95,5 @@ func (p *ArtDMXPacket) validate() error {
 
 // finish is used to finish the Packet for sending.
 func (p *ArtDMXPacket) finish() {
-	p.OpCode = code.OpCode(swapUint16(uint16(code.OpDMX)))
 	p.Length = 512
-	p.Header.finish()
 }

@@ -4,7 +4,17 @@ import (
 	"fmt"
 
 	"github.com/jsimonetti/go-artnet/packet/code"
+	"bytes"
+	"encoding/binary"
+	"encoding"
 )
+
+// ArtNetPacket is the interface used for passing around different kinds of ArtNet packets.
+type ArtNetPacket interface {
+	encoding.BinaryMarshaler
+	encoding.BinaryUnmarshaler
+	validate() error
+}
 
 // Unmarshal will unmarshal the bytes into an ArtNetPacket
 func Unmarshal(b []byte) (p ArtNetPacket, err error) {
@@ -17,7 +27,7 @@ func Unmarshal(b []byte) (p ArtNetPacket, err error) {
 	switch h.OpCode {
 	case code.OpPoll:
 		p = &ArtPollPacket{}
-	case code.OpCode(swapUint16(uint16(code.OpPollReply))):
+	case code.OpPollReply:
 		p = &ArtPollReplyPacket{}
 	case code.OpDiagData:
 		p = &ArtDiagDataPacket{}
@@ -69,4 +79,31 @@ func Unmarshal(b []byte) (p ArtNetPacket, err error) {
 
 	err = p.UnmarshalBinary(b)
 	return
+}
+
+func marshalPacket(p ArtNetPacket) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := binary.Write(&buf, binary.BigEndian, p); err != nil {
+		return nil, err
+	}
+	b := buf.Bytes()
+	//swap opCode Bytes
+	tmp := b[8]
+	b[8] = b[9]
+	b[9] = tmp
+
+	return b, nil
+}
+
+func unmarshalPacket(p ArtNetPacket, b []byte) error {
+	//swap opCode Bytes
+	tmp := b[8]
+	b[8] = b[9]
+	b[9] = tmp
+
+	buf := bytes.NewReader(b)
+	if err := binary.Read(buf, binary.BigEndian, p); err != nil {
+		return err
+	}
+	return p.validate()
 }
