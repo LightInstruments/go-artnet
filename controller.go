@@ -26,13 +26,13 @@ type ControlledNode struct {
 	UDPAddress net.UDPAddr
 
 	Sequence   uint8
-	DMXBuffer  map[Address][512]byte
+	DMXBuffer  map[DmxAddress][512]byte
 	LastUpdate time.Time
 	nodeLock   sync.Mutex
 }
 
 // setDMXBuffer will update the buffer on a universe address
-func (cn *ControlledNode) setDMXBuffer(dmx [512]byte, address Address) error {
+func (cn *ControlledNode) setDMXBuffer(dmx [512]byte, address DmxAddress) error {
 	cn.nodeLock.Lock()
 	defer cn.nodeLock.Unlock()
 
@@ -44,7 +44,7 @@ func (cn *ControlledNode) setDMXBuffer(dmx [512]byte, address Address) error {
 }
 
 // dmxUpdate will create an ArtDMXPacket and marshal it into bytes
-func (cn *ControlledNode) dmxUpdate(address Address) (b []byte, err error) {
+func (cn *ControlledNode) dmxUpdate(address DmxAddress) (b []byte, err error) {
 	var buf [512]byte
 	var ok bool
 
@@ -74,8 +74,8 @@ type Controller struct {
 
 	// Nodes is a slice of nodes that are seen by this controller
 	Nodes         []*ControlledNode
-	OutputAddress map[Address]*ControlledNode
-	InputAddress  map[Address]*ControlledNode
+	OutputAddress map[DmxAddress]*ControlledNode
+	InputAddress  map[DmxAddress]*ControlledNode
 	nodeLock      sync.Mutex
 
 	shutdownCh chan struct{}
@@ -96,8 +96,8 @@ func NewController(name string, ip net.IP, log Logger) *Controller {
 
 // Start will start this controller
 func (c *Controller) Start() error {
-	c.OutputAddress = make(map[Address]*ControlledNode)
-	c.InputAddress = make(map[Address]*ControlledNode)
+	c.OutputAddress = make(map[DmxAddress]*ControlledNode)
+	c.InputAddress = make(map[DmxAddress]*ControlledNode)
 	c.shutdownCh = make(chan struct{})
 	c.cNode.log = c.log.With(Fields{"type": "Node"})
 	c.log = c.log.With(Fields{"type": "Controller"})
@@ -193,7 +193,7 @@ func (c *Controller) pollLoop() {
 
 // SendDMXToAddress will set the DMXBuffer for a destination address
 // and update the node
-func (c *Controller) SendDMXToAddress(dmx [512]byte, address Address) {
+func (c *Controller) SendDMXToAddress(dmx [512]byte, address DmxAddress) {
 	c.log.With(Fields{"address": address.String()}).Debug("received update channels")
 
 	c.nodeLock.Lock()
@@ -298,7 +298,7 @@ func (c *Controller) updateNode(cfg NodeConfig) error {
 	}
 
 	// create an empty DMX buffer. This will blackout the node entirely
-	buf := make(map[Address][512]byte)
+	buf := make(map[DmxAddress][512]byte)
 	for _, port := range cfg.OutputPorts {
 		buf[port.Address] = [512]byte{}
 	}

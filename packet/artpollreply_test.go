@@ -8,6 +8,8 @@ import (
 	"github.com/jsimonetti/go-artnet/packet/code"
 )
 
+
+
 func TestArtPollReplyPacketMarshal(t *testing.T) {
 	tests := []struct {
 		name string

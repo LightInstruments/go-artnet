@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding"
-)
+	)
 
 // ArtNetPacket is the interface used for passing around different kinds of ArtNet packets.
 type ArtNetPacket interface {
@@ -76,6 +76,7 @@ func Unmarshal(b []byte) (p ArtNetPacket, err error) {
 	default:
 		return nil, fmt.Errorf("unimplemented opcode %#v found", h.OpCode)
 	}
+	//log.Println(h.OpCode)
 
 	err = p.UnmarshalBinary(b)
 	return
