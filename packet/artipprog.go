@@ -1,7 +1,7 @@
 package packet
 
 import (
-	"github.com/jsimonetti/go-artnet/packet/code"
+	"github.com/LightInstruments/go-artnet/packet/code"
 )
 
 var _ ArtNetPacket = &ArtIPProgPacket{}

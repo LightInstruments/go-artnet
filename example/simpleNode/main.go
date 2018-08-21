@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/jsimonetti/go-artnet/packet"
+	"github.com/LightInstruments/go-artnet/packet"
 	"log"
 	"net"
 )

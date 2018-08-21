@@ -3,7 +3,7 @@ package packet
 import (
 	"fmt"
 
-	"github.com/jsimonetti/go-artnet/packet/code"
+	"github.com/LightInstruments/go-artnet/packet/code"
 	"bytes"
 	"encoding/binary"
 	"encoding"

@@ -3,8 +3,8 @@ package packet
 import (
 			"encoding/binary"
 	"errors"
-		"github.com/jsimonetti/go-artnet/packet/code"
-	"github.com/jsimonetti/go-artnet/version"
+		"github.com/LightInstruments/go-artnet/packet/code"
+	"github.com/LightInstruments/go-artnet/version"
 )
 
 // Various errors which may occur when attempting to marshal or unmarshal

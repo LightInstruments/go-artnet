@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jsimonetti/go-artnet/packet"
-	"github.com/jsimonetti/go-artnet/packet/code"
+	"github.com/LightInstruments/go-artnet/packet"
+	"github.com/LightInstruments/go-artnet/packet/code"
 )
 
 // Node is the information known about a node
