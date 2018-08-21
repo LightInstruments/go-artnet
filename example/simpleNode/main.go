@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	src := fmt.Sprintf("%s:%d", "", packet.ArtNetPort+1)
+	src := fmt.Sprintf("%s:%d", "", packet.ArtNetPort)
 	localAddr, _ := net.ResolveUDPAddr("udp", src)
 
 	conn, err := net.ListenUDP("udp", localAddr)
@@ -82,7 +82,12 @@ func main() {
 			controllerAdd, _ := net.ResolveUDPAddr("udp", dst)
 			conn.WriteTo(b,controllerAdd)
 			log.Println(v.Version)
+		case *packet.ArtDMXPacket:
+			log.Println(v.Data)
+		case *packet.ArtPollReplyPacket:
+			log.Println("Got PollReply. Discarding.")
 		default:
+
 			log.Println("Misc Art Package")
 		}
 	}

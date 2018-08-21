@@ -22,6 +22,9 @@ var ArtNet = [8]byte{0x41, 0x72, 0x74, 0x2d, 0x4e, 0x65, 0x74, 0x00}
 // ArtNetPort is the fixed ArtNet port 6454.
 const ArtNetPort = 6454
 
+// HeaderLength
+const headerLength = 12
+
 // Header contains the base header for an ArtNet Packet
 type Header struct {
 	// ID is an Array of 8 characters, the final character is a null termination.
@@ -36,8 +39,28 @@ type Header struct {
 	Version [2]byte
 }
 
+//func(p *Header) MarshalBinary() ([]byte, error) {
+//	//b := make([]byte,headerLength)
+//	//b[:8] = ArtNet[:]
+//	////ocb, _ :=  p.OpCode.MarshalBinary()
+//	////b[8:10] = ocb
+//	//binary.LittleEndian.PutUint16(b[8:10],uint16(p.OpCode))
+//	//b[10:12] = p.Version[:]
+//	return b, nil
+//}
+//
+//func (p *Header) UnmarshalBinary(b []byte) error {
+//	if len(b) < headerLength {
+//		return errIncorrectHeaderLength
+//	}
+//	p.ID = [8]byte{b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]}
+//	p.OpCode = code.OpCode(binary.LittleEndian.Uint16([]byte{b[8], b[9]}))
+//	p.Version = [2]byte{b[10], b[11]}
+//	return nil
+//}
+
 func (p *Header) unmarshal(b []byte) error {
-	if len(b) < 12 {
+	if len(b) < headerLength {
 		return errIncorrectHeaderLength
 	}
 	p.ID = [8]byte{b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]}

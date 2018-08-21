@@ -8,32 +8,32 @@ import (
 	"github.com/LightInstruments/go-artnet/packet/code"
 )
 
-// Address contains a universe address
-type Address struct {
+// DmxAddress contains a universe address
+type DmxAddress struct {
 	Net    uint8 // 0-128
 	SubUni uint8
 }
 
-// String returns a string representation of Address
-func (a Address) String() string {
+// String returns a string representation of DmxAddress
+func (a DmxAddress) String() string {
 	return fmt.Sprintf("%d:%d.%d", a.Net, (a.SubUni >> 4), a.SubUni&0x0f)
 }
 
-// Integer returns the integer representation of Address
-func (a Address) Integer() int {
+// Integer returns the integer representation of DmxAddress
+func (a DmxAddress) Integer() int {
 	return int(uint16(a.Net)<<8 | uint16(a.SubUni))
 }
 
 // InputPort contains information for an input port
 type InputPort struct {
-	Address Address
+	Address DmxAddress
 	Type    code.PortType
 	Status  code.GoodInput
 }
 
 // OutputPort contains information for an input port
 type OutputPort struct {
-	Address Address
+	Address DmxAddress
 	Type    code.PortType
 	Status  code.GoodOutput
 }
@@ -58,7 +58,7 @@ type NodeConfig struct {
 	Status1 code.Status1
 	Status2 code.Status2
 
-	BaseAddress Address
+	BaseAddress DmxAddress
 	InputPorts  []InputPort
 	OutputPorts []OutputPort
 }
@@ -81,7 +81,7 @@ func ConfigFromArtPollReply(p packet.ArtPollReplyPacket) NodeConfig {
 		Port:         p.Port,
 		Status1:      p.Status1,
 		Status2:      p.Status2,
-		BaseAddress: Address{
+		BaseAddress: DmxAddress{
 			Net:    p.NetSwitch,
 			SubUni: p.SubSwitch,
 		},
@@ -90,7 +90,7 @@ func ConfigFromArtPollReply(p packet.ArtPollReplyPacket) NodeConfig {
 	for i := 0; i < int(p.NumPorts) && i < 4; i++ {
 		if p.PortTypes[i].Output() {
 			nodeConfig.OutputPorts = append(nodeConfig.OutputPorts, OutputPort{
-				Address: Address{
+				Address: DmxAddress{
 					Net:    nodeConfig.BaseAddress.Net,
 					SubUni: nodeConfig.BaseAddress.SubUni | p.SwOut[i],
 				},
@@ -100,7 +100,7 @@ func ConfigFromArtPollReply(p packet.ArtPollReplyPacket) NodeConfig {
 		}
 		if p.PortTypes[i].Input() {
 			nodeConfig.InputPorts = append(nodeConfig.InputPorts, InputPort{
-				Address: Address{
+				Address: DmxAddress{
 					Net:    nodeConfig.BaseAddress.Net,
 					SubUni: nodeConfig.BaseAddress.SubUni | p.SwIn[i],
 				},

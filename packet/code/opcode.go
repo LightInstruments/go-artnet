@@ -1,5 +1,9 @@
 package code
 
+import (
+	"encoding/binary"
+	)
+
 //go:generate stringer -type=OpCode
 
 // OpCode defines the class of data following an UDP packet.
@@ -9,6 +13,16 @@ type OpCode uint16
 func ValidOp(o OpCode) bool {
 	_, ok := _OpCode_map[o]
 	return ok
+}
+
+func (o OpCode) MarshalBinary() (data []byte, err error) {
+	binary.LittleEndian.PutUint16(data,uint16(o))
+	return data, nil
+}
+
+func (o OpCode) UnmarshalBinary(b []byte) error {
+	o = OpCode(binary.LittleEndian.Uint16(b))
+	return nil
 }
 
 const (
