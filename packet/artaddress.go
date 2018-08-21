@@ -2,6 +2,7 @@ package packet
 
 import (
 	"github.com/LightInstruments/go-artnet/packet/code"
+	"github.com/LightInstruments/go-artnet/version"
 )
 
 var _ ArtNetPacket = &ArtAddressPacket{}
@@ -73,7 +74,12 @@ type ArtAddressPacket struct {
 
 // NewArtAddressPacket returns an ArtNetPacket with the correct OpCode
 func NewArtAddressPacket() *ArtAddressPacket {
-	return &ArtAddressPacket{}
+
+	ap := &ArtAddressPacket{}
+	ap.ID = ArtNet
+	ap.OpCode = code.OpAddress
+	ap.Version = version.Bytes()
+	return ap
 }
 
 // MarshalBinary marshals an ArtAddressPacket into a byte slice.
